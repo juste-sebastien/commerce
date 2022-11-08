@@ -61,3 +61,14 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+def create(request):
+    if request.method == "POST":
+        print(request.POST)
+    else:
+        auction = Auction()
+        choices_list = [category[1] for category in auction.CATEGORY_CHOICES]
+        return render(request, "auctions/listings.html", {
+            "categories": choices_list,
+        })
