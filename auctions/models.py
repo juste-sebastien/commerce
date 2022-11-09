@@ -25,15 +25,30 @@ class Auction(models.Model):
         (BOOK, "Books, Comics,...")
     ]
 
+
+    ONE = 1
+    THREE = 3
+    SEVEN = 7
+    FOURTEEN = 14
+
+    DURATION_CHOICES = [
+        (ONE, "1 day"),
+        (THREE, "3 days"),
+        (SEVEN, "7 days"),
+        (FOURTEEN, "14 days")
+    ]
+
     title = models.CharField(max_length=64)
     description = models.TextField(max_length=500, blank=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     image = models.URLField(blank=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller")
-    duration = models.IntegerField(default=7)
+    duration = models.CharField(max_length=7, choices=DURATION_CHOICES, default=SEVEN)
     category = models.CharField(max_length=3, choices=CATEGORY_CHOICES, default=INFORMATION_TECHNOLOGY)
-    start_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
 
+    def __str__(self):
+        return f"{self.id}: {self.title}"
 
 class Bid(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
