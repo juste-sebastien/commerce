@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -40,10 +41,10 @@ class Auction(models.Model):
 
     title = models.CharField(max_length=64)
     description = models.TextField(max_length=500, blank=True)
-    creation_date = models.DateTimeField(auto_now_add=True)
-    image = models.URLField(blank=True)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller")
-    duration = models.CharField(max_length=7, choices=DURATION_CHOICES, default=SEVEN)
+    creation_date = timezone.now()
+    image = models.URLField(null=True, blank=True, default="")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller")
+    duration = models.IntegerField(max_length=7, choices=DURATION_CHOICES)
     category = models.CharField(max_length=3, choices=CATEGORY_CHOICES, default=INFORMATION_TECHNOLOGY)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
 

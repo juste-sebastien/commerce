@@ -11,7 +11,10 @@ from .forms import CreateListingsForm
 from datetime import datetime
 
 def index(request):
-    return render(request, "auctions/index.html")
+    print(Auction.objects.all())
+    return render(request, "auctions/index.html", {
+        "listings": Auction.objects.all(),
+    })
 
 
 def login_view(request):
@@ -70,28 +73,20 @@ def register(request):
 def create(request):
     if request.method == "POST":
         form = CreateListingsForm(request.POST)
+        form.instance.user = request.user
+        if request.POST["image"] == []:
+            request.POST["image"] = 'https://cdn.onlinewebfonts.com/svg/img_391144.png'
+        print(request.POST)
         if form.is_valid():
-            title = form.cleaned_data["title"]
-            description = form.cleaned_data["description"]
-            if request.POST["image"] != []:
-                image = form.cleaned_data["image"]
-            else:
-                image = form.cleaned_data("https://www.freeiconspng.com/img/23494")
-            category = form.cleaned_data["category"]
-            duration = form.cleaned_data["duration"]
-            start_price = form.cleaned_data["start_price"]
-
-            listing = Auction(
-                title=title,
-                description=description,
-                creation_date=datetime.now(),
-                image=image,
-                seller=User.objects.get(username=request.user),
-                category=category,
-                duration=duration,
-                price=start_price
-            )
-        return HttpResponseRedirect(reverse("index"))
+            form.save()
+            print('valid')
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            print(form.errors)
+            form = CreateListingsForm()
+            return render(request, "auctions/listings.html", {
+            "form": form
+            })
     else:
         form = CreateListingsForm()
         return render(request, "auctions/listings.html", {
