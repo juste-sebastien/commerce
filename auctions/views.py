@@ -8,8 +8,6 @@ from django.urls import reverse
 from .models import User, Auction
 from .forms import CreateListingsForm
 
-from datetime import datetime
-
 def index(request):
     print(Auction.objects.all())
     return render(request, "auctions/index.html", {

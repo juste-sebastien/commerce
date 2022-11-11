@@ -44,12 +44,12 @@ class Auction(models.Model):
     creation_date = timezone.now()
     image = models.URLField(null=True, blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller")
-    duration = models.IntegerField(max_length=7, choices=DURATION_CHOICES)
+    duration = models.IntegerField(choices=DURATION_CHOICES)
     category = models.CharField(max_length=3, choices=CATEGORY_CHOICES, default=INFORMATION_TECHNOLOGY)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
 
     def __str__(self):
-        return f"{self.id}: {self.title}"
+        return f"{self.id}: {self.title} by {self.user}"
 
 class Bid(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)

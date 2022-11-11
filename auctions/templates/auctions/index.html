@@ -2,6 +2,23 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-    TODO
+    <section>
+        {% for listing in listings %}
+            <article>
+                <img src="{{ listing.image }}" alt="no article image" />
+                <div>
+                    <h3>{{ listing.title }}</h3>
+                    <p>{{ listing.description }}</p>
+                    <div>
+                        <p>End in {{ listing.remaining }}</p>
+                        <p>Seller: {{ listing.user }}</p>
+                    </div>
+                </div>
+                <div>
+                    <h5>Current Price</h5>
+                    <p>{{ listing.price }}</p>
+                </div>
+            </article>
+        {% endfor %}
+    </section>
 {% endblock %}
