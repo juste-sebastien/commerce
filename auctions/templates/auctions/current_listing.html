@@ -1,0 +1,33 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if not message %}
+        <p>Error!</p>
+    {% endif %}
+    <div>
+        <h2>{{ title }}</h2>
+        {% if user != auction_user %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ watchlist_form }}
+                <input type="submit" name="watch" value="{{ watchlist_text }}" />
+            </form>
+        {% endif %}
+        <h4>Description</h4>
+        <p>{{ description }}</p>
+        <h4>Current Price</h4>
+        <p>{{ price }}</p>
+        <img scr="{{ image }}" alt="No item image" />
+        <h4>Seller</h4>
+        <p>{{ auction_user }}</p>
+        {% if user != auction_user %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ bid_form }}
+                <input type="submit" name="bid" value="Place Bid" />
+            </form>
+        {% endif %}
+        <h4>End in</h4>
+        <p>{{ remaining_time }}</p>  
+    </div>
+{% endblock %}

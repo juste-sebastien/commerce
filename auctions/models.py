@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
@@ -41,7 +43,7 @@ class Auction(models.Model):
 
     title = models.CharField(max_length=64)
     description = models.TextField(max_length=500, blank=True)
-    creation_date = timezone.now()
+    creation_date = models.DateTimeField(auto_now_add=True)
     image = models.URLField(null=True, blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller")
     duration = models.IntegerField(choices=DURATION_CHOICES)
@@ -50,6 +52,15 @@ class Auction(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.title} by {self.user}"
+
+    def get_end_date(self, current, duration):
+        end = current + timedelta(days=duration)
+        return end
+
+    def get_remaining_time(self, current):
+        remaining = self.get_end_date(self.creation_date, self.duration)- current
+        return remaining
+
 
 class Bid(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
@@ -63,3 +74,8 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment_date = models.DateTimeField(auto_now_add=True)
     content = models.TextField(max_length=500)
+
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    watchlist = models.ManyToManyField(Auction, blank=True, related_name="listings")
