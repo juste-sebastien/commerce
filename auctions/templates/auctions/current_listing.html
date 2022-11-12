@@ -5,26 +5,30 @@
         <p>Error!</p>
     {% endif %}
     <div>
-        <h2>{{ title }}</h2>
-        {% if user != auction_user %}
+        <h2>{{ auction.title }}</h2>
+        {% if user in users and user.id != auction.user %}
             <form method="POST">
                 {% csrf_token %}
-                {{ watchlist_form }}
                 <input type="submit" name="watch" value="{{ watchlist_text }}" />
             </form>
         {% endif %}
         <h4>Description</h4>
-        <p>{{ description }}</p>
+        <p>{{ auction.description }}</p>
         <h4>Current Price</h4>
-        <p>{{ price }}</p>
+        <p>{{ auction.price }}</p>
         <img scr="{{ image }}" alt="No item image" />
         <h4>Seller</h4>
-        <p>{{ auction_user }}</p>
-        {% if user != auction_user %}
+        <p>{{ auction.user }}</p>
+        {% if user in users and user.id != auction.user %}
             <form method="POST">
                 {% csrf_token %}
                 {{ bid_form }}
                 <input type="submit" name="bid" value="Place Bid" />
+            </form>
+        {% elif user.id == auction.user %}
+            <form action="{% url 'close_listing' auction.id %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" name="close" value="Close Auction" />
             </form>
         {% endif %}
         <h4>End in</h4>
