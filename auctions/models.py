@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-    pass
+    watchlist = models.ManyToManyField('Auction', blank=True, related_name="listings")
 
 
 class Auction(models.Model):
@@ -25,9 +25,8 @@ class Auction(models.Model):
         (HOBBIES, "Hobbies"),
         (INFORMATION_TECHNOLOGY, "Laptop, Desktop, Mobile Phone"),
         (MUSIC, "CD, Musical Intrusments"),
-        (BOOK, "Books, Comics,...")
+        (BOOK, "Books, Comics,..."),
     ]
-
 
     ONE = 1
     THREE = 3
@@ -38,7 +37,7 @@ class Auction(models.Model):
         (ONE, "1 day"),
         (THREE, "3 days"),
         (SEVEN, "7 days"),
-        (FOURTEEN, "14 days")
+        (FOURTEEN, "14 days"),
     ]
 
     title = models.CharField(max_length=64)
@@ -47,8 +46,11 @@ class Auction(models.Model):
     image = models.URLField(null=True, blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller")
     duration = models.IntegerField(choices=DURATION_CHOICES)
-    category = models.CharField(max_length=3, choices=CATEGORY_CHOICES, default=INFORMATION_TECHNOLOGY)
+    category = models.CharField(
+        max_length=3, choices=CATEGORY_CHOICES, default=INFORMATION_TECHNOLOGY
+    )
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.id}: {self.title} by {self.user}"
@@ -58,7 +60,7 @@ class Auction(models.Model):
         return end
 
     def get_remaining_time(self, current):
-        remaining = self.get_end_date(self.creation_date, self.duration)- current
+        remaining = self.get_end_date(self.creation_date, self.duration) - current
         return remaining
 
 
@@ -74,8 +76,3 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment_date = models.DateTimeField(auto_now_add=True)
     content = models.TextField(max_length=500)
-
-
-class Watchlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    watchlist = models.ManyToManyField(Auction, blank=True, related_name="listings")
