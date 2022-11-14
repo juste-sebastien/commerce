@@ -3,26 +3,27 @@
 {% block body %}
     <h2>{{ username }}'s Watchlist</h2>
     <section>
-        {% for auction in watchlist %}
-            <article>
-                <img src="{{ listing.image }}" alt="no article image" />
-                <div>
-                    <h3><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
-                    <p>{{ listing.description }}</p>
+        {% for listing in watchlist %}
+            {% if listing.status %}
+                <article>
+                    <img src="{{ listing.image }}" alt="no article image" />
                     <div>
-                        <p>End in {{ listing.remaining }}</p>
-                        <p>Seller: {{ listing.user }}</p>
+                        <h3><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
+                        <p>{{ listing.description }}</p>
+                        <div>
+                            <p>End in {{ listing.remaining }}</p>
+                            <p>Seller: {{ listing.user }}</p>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <h5>Current Price</h5>
-                    <p>{{ listing.price }}</p>
-                </div>
-            </article>
-        {% empty %}
-            <article>
-                <p>No article yet. <a href="{% url 'listings_create' %}">Add</a> new one </p>
-            </article>
+                    <div>
+                        <h5>Current Price</h5>
+                        <p>{{ listing.price }}</p>
+                    </div>
+                </article>
+            {% endif %}
         {% endfor %}
+        <article>
+            <p>Want more article? <a href="{% url 'index' %}">Add</a> new one </p>
+        </article>
     </section>
 {% endblock %}

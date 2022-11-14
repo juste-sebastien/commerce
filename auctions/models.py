@@ -51,6 +51,7 @@ class Auction(models.Model):
     )
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
     status = models.BooleanField(default=True)
+    remaining = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return f"{self.id}: {self.title} by {self.user}"
@@ -59,9 +60,12 @@ class Auction(models.Model):
         end = current + timedelta(days=duration)
         return end
 
-    def get_remaining_time(self, current):
-        remaining = self.get_end_date(self.creation_date, self.duration) - current
-        return remaining
+    def update_remaining_time(self, current):
+        time = self.get_end_date(self.creation_date, self.duration) - current
+        if time < timedelta():
+            self.status = False
+        self.remaining = str(time)[:-7]
+        return self.remaining
 
 
 class Bid(models.Model):

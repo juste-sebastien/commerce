@@ -6,7 +6,7 @@
     {% endif %}
     <div>
         <h2>{{ auction.title }}</h2>
-        {% if user in users and user.id != auction.user %}
+        {% if user in users and user.id != auction.user.id %}
             <form method="POST">
                 {% csrf_token %}
                 <input type="submit" name="watch" value="{{ watchlist_text }}" />
@@ -19,19 +19,19 @@
         <img scr="{{ image }}" alt="No item image" />
         <h4>Seller</h4>
         <p>{{ auction.user }}</p>
-        {% if user in users and user.id != auction.user %}
+        {% if user in users and user.id != auction.user.id %}
             <form method="POST">
                 {% csrf_token %}
                 {{ bid_form }}
                 <input type="submit" name="bid" value="Place Bid" />
             </form>
-        {% elif user.id == auction.user %}
+        {% elif user.id == auction.user.id %}
             <form action="{% url 'close_listing' auction.id %}" method="POST">
                 {% csrf_token %}
                 <input type="submit" name="close" value="Close Auction" />
             </form>
         {% endif %}
         <h4>End in</h4>
-        <p>{{ remaining_time }}</p>  
+        <p>{{ auction.remaining }}</p>  
     </div>
 {% endblock %}

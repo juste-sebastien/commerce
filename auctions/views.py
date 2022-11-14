@@ -13,6 +13,8 @@ from .forms import *
 
 
 def index(request):
+    for auction in Auction.objects.all():
+        update_auction_time(auction)
     return render(
         request,
         "auctions/index.html",
@@ -101,6 +103,7 @@ def create(request):
 def get_listing(request, listing_id):
     bid_form = BidForm()
     auction = Auction.objects.get(pk=listing_id)
+    update_auction_time(auction)
 
     try: 
         user = User.objects.get(username=request.user)
@@ -109,11 +112,10 @@ def get_listing(request, listing_id):
         button_text = ""
     else:
         if is_in_watchlist(auction, user):
-            button_text = "Add to Watchlist"
-        else:
             button_text = "Remove from Watchlist"
+        else:
+            button_text = "Add to Watchlist"
 
-    remaining_time = str(auction.get_remaining_time(timezone.now()))[:-7]
     message = True
 
     if request.method == "POST":
@@ -121,6 +123,7 @@ def get_listing(request, listing_id):
             message = is_valid_bid(request, auction)
         else:
             button_text, message = modify_watchlist(auction, user)
+
     return render(
         request,
         "auctions/current_listing.html",
@@ -128,7 +131,6 @@ def get_listing(request, listing_id):
             "auction": auction,
             "user": user,
             "users": User.objects.all(),
-            "remaining_time": remaining_time,
             "bid_form": bid_form,
             "message": message,
             "watchlist_text": button_text,
@@ -162,19 +164,27 @@ def modify_watchlist(auction, user):
     elif not statement:
         user.watchlist.add(auction)
         user.save()
-        return "Delete from Watchlist", True
+        return "Remove from Watchlist", True
     return "Error! Reload page", False
     
 
 @login_required
 def watchlist(request):
     user = User.objects.get(username=request.user)
+    for auction in user.watchlist.all():
+        update_auction_time(auction)
     return render(request, "auctions/watchlist.html", {
         "watchlist": user.watchlist.all(),
         "username": user.username.capitalize(),
     })
 
 
+def update_auction_time(auction):
+    auction.update_remaining_time(timezone.now())
+    auction.save()
+
+
 @login_required
-def close_auction(request):
-    print(request.POST)
+def close_auction(request, auction_id):
+    auction = Auction.objects.get(id=auction_id)
+    auction.status = False
