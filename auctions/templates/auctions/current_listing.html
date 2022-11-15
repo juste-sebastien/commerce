@@ -5,8 +5,14 @@
         <p>Error!</p>
     {% endif %}
     <div>
+        {% if not auction.status %}
+            <div>
+                <h5>Auction closed. Winner</h5>
+                <p>{{ auction.winner }}</p>
+            </div>
+        {% endif %}
         <h2>{{ auction.title }}</h2>
-        {% if user in users and user.id != auction.user.id %}
+        {% if user in users and user.id != auction.user.id and auction.status %}
             <form method="POST">
                 {% csrf_token %}
                 <input type="submit" name="watch" value="{{ watchlist_text }}" />
@@ -19,13 +25,13 @@
         <img scr="{{ image }}" alt="No item image" />
         <h4>Seller</h4>
         <p>{{ auction.user }}</p>
-        {% if user in users and user.id != auction.user.id %}
+        {% if user in users and user.id != auction.user.id and auction.status %}
             <form method="POST">
                 {% csrf_token %}
                 {{ bid_form }}
                 <input type="submit" name="bid" value="Place Bid" />
             </form>
-        {% elif user.id == auction.user.id %}
+        {% elif user.id == auction.user.id and auction.status %}
             <form action="{% url 'close_listing' auction.id %}" method="POST">
                 {% csrf_token %}
                 <input type="submit" name="close" value="Close Auction" />
@@ -34,4 +40,19 @@
         <h4>End in</h4>
         <p>{{ auction.remaining }}</p>  
     </div>
+    {% for comment in comments %}
+        <article>
+            <h5>{{ comment.title }}</h5>
+            <p> Posted by {{ comment.user.username }} {{ comment.date }}</p>
+            <br />
+            <p> {{comment.content }}</p>
+        </article>
+    {% endfor %}
+    {% if user in users %}
+        <form method="POST">
+            {% csrf_token %}
+            {{ comment_form }}
+            <input type="submit" name="comment" value="Add Comment" />
+        </form>
+    {% endif %}
 {% endblock %}

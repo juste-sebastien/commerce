@@ -101,7 +101,6 @@ def create(request):
 
 
 def get_listing(request, listing_id):
-    bid_form = BidForm()
     auction = Auction.objects.get(pk=listing_id)
     update_auction_time(auction)
 
@@ -120,7 +119,9 @@ def get_listing(request, listing_id):
 
     if request.method == "POST":
         if "bid" in request.POST:
-            message = is_valid_bid(request, auction)
+            message = is_valid_bid(request, auction, user)
+        elif "comment" in request.POST:
+            message = is_valid_comment(request, auction, user)
         else:
             button_text, message = modify_watchlist(auction, user)
 
@@ -131,20 +132,29 @@ def get_listing(request, listing_id):
             "auction": auction,
             "user": user,
             "users": User.objects.all(),
-            "bid_form": bid_form,
+            "bid_form": BidForm(),
+            "comment_form": CommentForm(),
             "message": message,
             "watchlist_text": button_text,
+            "comments": auction.comments.all(),
         },
     )
 
 
-def is_valid_bid(request, auction):
-    new_price = request.POST["price"]
-    if Decimal(new_price) > auction.price:
-        auction.price = new_price
-        auction.save()
+def is_valid_bid(request, auction, user):
+    new_price = Decimal(request.POST["price"])
+    if new_price > auction.price:
+        place_bid(new_price, auction, user)
         return True
     return False
+
+
+def place_bid(price, auction, user):
+    auction.price = price
+    bid = Bid.objects.create(auction=auction, user=user, auction_date=timezone.now(), price=auction.price)
+    bid.save()
+    auction.bids.add(bid)
+    auction.save()
 
 
 def is_in_watchlist(auction, user):
@@ -168,6 +178,21 @@ def modify_watchlist(auction, user):
     return "Error! Reload page", False
     
 
+def is_valid_comment(request, auction, user):
+    comment = request.POST["content"]
+    title = request.POST["title"]
+    try:
+        new_comment = Comment.objects.create(auction=auction, user=user, title=title, date=timezone.now(), content=comment)
+    except:
+        return False
+    else:
+        new_comment.save()
+        auction.comments.add(new_comment)
+        auction.save()
+        return True
+    
+
+
 @login_required
 def watchlist(request):
     user = User.objects.get(username=request.user)
@@ -180,11 +205,37 @@ def watchlist(request):
 
 
 def update_auction_time(auction):
-    auction.update_remaining_time(timezone.now())
+    """    if not auction.is_valid_time(timezone.now()):
+            update_winner(auction)
+        else:"""
+    if not auction.update_remaining_time(timezone.now()):
+        bid = search_bid(auction)
+        auction.update_winner(bid)
     auction.save()
+
+
+def search_bid(auction):
+    try:
+        bid = Bid.objects.get(auction=auction, price=auction.price)
+    except Bid.DoesNotExist:
+        print("bid not found")
+        return None
+    else:
+        return bid
 
 
 @login_required
 def close_auction(request, auction_id):
     auction = Auction.objects.get(id=auction_id)
     auction.status = False
+    bid = search_bid(auction)
+    if bid != None:
+        auction.winner = auction.update_winner(bid)
+    auction.remaining = "Ended"
+    auction.save()
+    return HttpResponseRedirect((reverse('index')))
+
+
+@login_required
+def comment(request):
+    pass

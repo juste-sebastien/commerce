@@ -1,29 +1,35 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>{{ username }}'s Watchlist</h2>
-    <section>
+    <article>
+        <h2>{{ username }}'s Watchlist</h2>
         {% for listing in watchlist %}
+            <section>
+                <img src="{{ listing.image }}" alt="no article image" />
+                <div>
+                    <h3><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
+                    <p>{{ listing.description }}</p>
+                    <div>
+                        <p>End in {{ listing.remaining }}</p>
+                        <p>Seller: {{ listing.user }}</p>
+                    </div>
+                </div>
             {% if listing.status %}
-                <article>
-                    <img src="{{ listing.image }}" alt="no article image" />
-                    <div>
-                        <h3><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
-                        <p>{{ listing.description }}</p>
-                        <div>
-                            <p>End in {{ listing.remaining }}</p>
-                            <p>Seller: {{ listing.user }}</p>
-                        </div>
-                    </div>
-                    <div>
-                        <h5>Current Price</h5>
-                        <p>{{ listing.price }}</p>
-                    </div>
-                </article>
+                <div>
+                    <h5>Current Price</h5>
+                    <p>{{ listing.price }}</p>
+                </div>
+            {% else %}
+                <div>
+                    <h5>Auction closed. Winner</h5>
+                    <p>{{ listing.winner }}</p>
+                </div>
             {% endif %}
+            </section>
+
         {% endfor %}
-        <article>
+        <section>
             <p>Want more article? <a href="{% url 'index' %}">Add</a> new one </p>
-        </article>
-    </section>
+        </section>
+    </article>
 {% endblock %}

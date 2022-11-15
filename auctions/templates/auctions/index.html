@@ -2,10 +2,10 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-    <section>
+    <article>
         {% for listing in listings %}
             {% if listing.status %}
-                <article>
+                <section>
                     <img src="{{ listing.image }}" alt="no article image" />
                     <div>
                         <h3><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
@@ -15,16 +15,23 @@
                             <p>Seller: {{ listing.user }}</p>
                         </div>
                     </div>
-                    <div>
-                        <h5>Current Price</h5>
-                        <p>{{ listing.price }}</p>
-                    </div>
-                </article>
+                    {% if listing.status %}
+                        <div>
+                            <h5>Current Price</h5>
+                            <p>{{ listing.price }}</p>
+                        </div>
+                    {% else %}
+                        <div>
+                            <h5>Auction closed. Winner</h5>
+                            <p>{{ listing.winner }}</p>
+                        </div>
+                    {% endif %}
+                </section>
             {% endif %}
         {% empty %}
-            <article>
+            <section>
                 <p>No article yet. <a href="{% url 'listings_create' %}">Add</a> new one </p>
-            </article>
+            </section>
         {% endfor %}
-    </section>
+    </article>
 {% endblock %}

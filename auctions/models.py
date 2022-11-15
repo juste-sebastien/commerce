@@ -51,7 +51,10 @@ class Auction(models.Model):
     )
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
     status = models.BooleanField(default=True)
-    remaining = models.CharField(max_length=200, blank=True)
+    remaining = models.CharField(max_length=32, blank=True)
+    winner = models.CharField(max_length=64, blank=True)
+    bids = models.ManyToManyField('Bid', blank=True, related_name="bids")
+    comments = models.ManyToManyField('Comment', blank=True, related_name="comments")
 
     def __str__(self):
         return f"{self.id}: {self.title} by {self.user}"
@@ -62,10 +65,21 @@ class Auction(models.Model):
 
     def update_remaining_time(self, current):
         time = self.get_end_date(self.creation_date, self.duration) - current
-        if time < timedelta():
+        if self.is_valid_time(time):
+            self.remaining = str(time)[:-7]
+            return True
+        else:
             self.status = False
-        self.remaining = str(time)[:-7]
-        return self.remaining
+            return False
+
+    def is_valid_time(self, time):
+        if time > timedelta():
+            return True
+        return False
+
+    def update_winner(self, bid):
+        self.winner = bid.user.username
+        return self.winner
 
 
 class Bid(models.Model):
@@ -74,9 +88,16 @@ class Bid(models.Model):
     auction_date = models.DateTimeField(auto_now_add=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
 
+    def __str__(self):
+        return f"{self.id}: {self.auction.title} by {self.user.username} at {self.price}"
+
 
 class Comment(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment_date = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=64, default="New comment")
+    date = models.DateField(auto_now_add=True)
     content = models.TextField(max_length=500)
+
+    def __str__(self):
+        return f"{self.id}: {self.user.username} {self.date}"
