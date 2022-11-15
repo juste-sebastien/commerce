@@ -19,3 +19,7 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ["title", "content"]
+
+
+class CategoryForm(forms.Form):
+    select = forms.ChoiceField(choices=Auction.CATEGORY_CHOICES)

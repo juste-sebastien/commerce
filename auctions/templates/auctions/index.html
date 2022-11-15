@@ -1,8 +1,13 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
     <article>
+        <h2>Active Listings</h2>
+        <p>Scroll down or choose a category</p>
+        <form action="{% url 'category_view' %}">
+            {{ category_form }}
+            <input type="submit" value="Go">
+        </form>
         {% for listing in listings %}
             {% if listing.status %}
                 <section>

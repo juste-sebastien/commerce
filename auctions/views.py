@@ -20,6 +20,7 @@ def index(request):
         "auctions/index.html",
         {
             "listings": Auction.objects.all(),
+            "category_form": CategoryForm(),
         },
     )
 
@@ -104,7 +105,7 @@ def get_listing(request, listing_id):
     auction = Auction.objects.get(pk=listing_id)
     update_auction_time(auction)
 
-    try: 
+    try:
         user = User.objects.get(username=request.user)
     except User.DoesNotExist:
         user = request.user
@@ -151,7 +152,9 @@ def is_valid_bid(request, auction, user):
 
 def place_bid(price, auction, user):
     auction.price = price
-    bid = Bid.objects.create(auction=auction, user=user, auction_date=timezone.now(), price=auction.price)
+    bid = Bid.objects.create(
+        auction=auction, user=user, auction_date=timezone.now(), price=auction.price
+    )
     bid.save()
     auction.bids.add(bid)
     auction.save()
@@ -176,13 +179,19 @@ def modify_watchlist(auction, user):
         user.save()
         return "Remove from Watchlist", True
     return "Error! Reload page", False
-    
+
 
 def is_valid_comment(request, auction, user):
     comment = request.POST["content"]
     title = request.POST["title"]
     try:
-        new_comment = Comment.objects.create(auction=auction, user=user, title=title, date=timezone.now(), content=comment)
+        new_comment = Comment.objects.create(
+            auction=auction,
+            user=user,
+            title=title,
+            date=timezone.now(),
+            content=comment,
+        )
     except:
         return False
     else:
@@ -190,7 +199,6 @@ def is_valid_comment(request, auction, user):
         auction.comments.add(new_comment)
         auction.save()
         return True
-    
 
 
 @login_required
@@ -198,16 +206,17 @@ def watchlist(request):
     user = User.objects.get(username=request.user)
     for auction in user.watchlist.all():
         update_auction_time(auction)
-    return render(request, "auctions/watchlist.html", {
-        "watchlist": user.watchlist.all(),
-        "username": user.username.capitalize(),
-    })
+    return render(
+        request,
+        "auctions/watchlist.html",
+        {
+            "watchlist": user.watchlist.all(),
+            "username": user.username.capitalize(),
+        },
+    )
 
 
 def update_auction_time(auction):
-    """    if not auction.is_valid_time(timezone.now()):
-            update_winner(auction)
-        else:"""
     if not auction.update_remaining_time(timezone.now()):
         bid = search_bid(auction)
         auction.update_winner(bid)
@@ -233,9 +242,20 @@ def close_auction(request, auction_id):
         auction.winner = auction.update_winner(bid)
     auction.remaining = "Ended"
     auction.save()
-    return HttpResponseRedirect((reverse('index')))
+    return HttpResponseRedirect((reverse("index")))
 
 
-@login_required
-def comment(request):
-    pass
+def categorize(request):
+    category_filter = request.GET["select"]
+    for i in range(len(Auction.CATEGORY_CHOICES)):
+        if Auction.CATEGORY_CHOICES[i][0] == category_filter:
+            category_index = i
+    listings = Auction.objects.filter(category=category_filter)
+    return render(
+        request,
+        "auctions/category_listing.html",
+        {
+            "listings": listings,
+            "category": Auction.CATEGORY_CHOICES[category_index][1],
+        }
+    )

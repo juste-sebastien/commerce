@@ -1,0 +1,35 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <article>
+        <h2>{{ category }}'s auctions</h2>
+        {% for listing in listings %}
+            <section>
+                <img src="{{ listing.image }}" alt="no article image" />
+                <div>
+                    <h3><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
+                    <p>{{ listing.description }}</p>
+                    <div>
+                        <p>End in {{ listing.remaining }}</p>
+                        <p>Seller: {{ listing.user }}</p>
+                    </div>
+                </div>
+            {% if listing.status %}
+                <div>
+                    <h5>Current Price</h5>
+                    <p>{{ listing.price }}</p>
+                </div>
+            {% else %}
+                <div>
+                    <h5>Auction closed. Winner</h5>
+                    <p>{{ listing.winner }}</p>
+                </div>
+            {% endif %}
+            </section>
+        {% empty %}
+        <section>
+            <p>No article yet. <a href="{% url 'listings_create' %}">Add</a> new one </p>
+        </section>}
+        {% endfor %}
+    </article>
+{% endblock %}

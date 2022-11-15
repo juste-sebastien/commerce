@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-    watchlist = models.ManyToManyField('Auction', blank=True, related_name="listings")
+    watchlist = models.ManyToManyField("Auction", blank=True, related_name="listings")
 
 
 class Auction(models.Model):
@@ -53,8 +53,8 @@ class Auction(models.Model):
     status = models.BooleanField(default=True)
     remaining = models.CharField(max_length=32, blank=True)
     winner = models.CharField(max_length=64, blank=True)
-    bids = models.ManyToManyField('Bid', blank=True, related_name="bids")
-    comments = models.ManyToManyField('Comment', blank=True, related_name="comments")
+    bids = models.ManyToManyField("Bid", blank=True, related_name="bids")
+    comments = models.ManyToManyField("Comment", blank=True, related_name="comments")
 
     def __str__(self):
         return f"{self.id}: {self.title} by {self.user}"
@@ -89,7 +89,9 @@ class Bid(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
 
     def __str__(self):
-        return f"{self.id}: {self.auction.title} by {self.user.username} at {self.price}"
+        return (
+            f"{self.id}: {self.auction.title} by {self.user.username} at {self.price}"
+        )
 
 
 class Comment(models.Model):
