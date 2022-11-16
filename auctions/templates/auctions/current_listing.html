@@ -2,57 +2,73 @@
 
 {% block body %}
     {% if not message %}
-        <p>Error!</p>
+        <p class="alert alert-warning" role="alert">Error!</p>
     {% endif %}
-    <div>
+    <div class="container-fluid">
         {% if not auction.status %}
             <div>
                 <h5>Auction closed. Winner</h5>
                 <p>{{ auction.winner }}</p>
             </div>
         {% endif %}
-        <h2>{{ auction.title }}</h2>
-        {% if user in users and user.id != auction.user.id and auction.status %}
-            <form method="POST">
-                {% csrf_token %}
-                <input type="submit" name="watch" value="{{ watchlist_text }}" />
-            </form>
-        {% endif %}
-        <h4>Description</h4>
-        <p>{{ auction.description }}</p>
-        <h4>Current Price</h4>
-        <p>{{ auction.price }}</p>
-        <img scr="{{ image }}" alt="No item image" />
-        <h4>Seller</h4>
-        <p>{{ auction.user }}</p>
-        {% if user in users and user.id != auction.user.id and auction.status %}
-            <form method="POST">
-                {% csrf_token %}
-                {{ bid_form }}
-                <input type="submit" name="bid" value="Place Bid" />
-            </form>
-        {% elif user.id == auction.user.id and auction.status %}
-            <form action="{% url 'close_listing' auction.id %}" method="POST">
-                {% csrf_token %}
-                <input type="submit" name="close" value="Close Auction" />
-            </form>
-        {% endif %}
-        <h4>End in</h4>
-        <p>{{ auction.remaining }}</p>  
-    </div>
-    {% for comment in comments %}
-        <article>
-            <h5>{{ comment.title }}</h5>
-            <p> Posted by {{ comment.user.username }} {{ comment.date }}</p>
+        <div class="col">
+            <div class="row">
+                <h2 class="col-md-4">{{ auction.title }}</h2>
+                {% if user in users and user.id != auction.user.id and auction.status %}
+                    <form class="col-md-4" method="POST">
+                        {% csrf_token %}
+                        <input class="btn btn-primary col-md-8" type="submit" name="watch" value="{{ watchlist_text }}" />
+                    </form>
+                {% endif %}
+                <img class="col-md-4" scr="{{ auction.image }}" alt="No item image" />
+            </div>
+            <div class="row"></div>
+                <h4>Description</h4>
+                <p style="min-height: 20vh">{{ auction.description }}</p>
+            </div>
+            <div class="row">
+                <h4 class="col-md-4">Current Price</h4>
+                <p class="col-md-4" style="font-size: xx-large;">{{ auction.price }}</p>
+                
+                <h4 class="col-md-2">Seller</h4>
+                <p class="col-md-2">{{ auction.user }}</p>
+            </div>
+            <div class="row gy-5">
+                {% if user in users and user.id != auction.user.id and auction.status %}
+                    <form class="col-md-8" method="POST">
+                        {% csrf_token %}
+                        {{ bid_form }}
+                        <input class="btn btn-primary" type="submit" name="bid" value="Place Bid" />
+                    </form>
+                {% elif user.id == auction.user.id and auction.status %}
+                    <form class="col-md-8" action="{% url 'close_listing' auction.id %}" method="POST">
+                        {% csrf_token %}
+                        <input type="submit" name="close" value="Close Auction" />
+                    </form>
+                {% endif %}
+                <h4 class="col-md-2">End in</h4>
+                <p class="col-md-2">{{ auction.remaining }}</p> 
+            </div>
+        </div>
+        <hr />
+        {% for comment in comments %}
+        <article class="card text-bg-primary mb-3">
+            <h5 class="card-header">{{ comment.title }}</h5>
+            <p class="card-subtitle mb-2 text-muted" style="margin: 5px"> Posted by {{ comment.user.username }} {{ comment.date }}</p>
             <br />
-            <p> {{comment.content }}</p>
+            <p class="card-body bg-transparent"> {{comment.content }}</p>
         </article>
-    {% endfor %}
-    {% if user in users %}
-        <form method="POST">
-            {% csrf_token %}
-            {{ comment_form }}
-            <input type="submit" name="comment" value="Add Comment" />
-        </form>
-    {% endif %}
+        <br />
+        {% endfor %}
+        {% if user in users %}
+            <div class="col">
+                <form class="col-md-12" method="POST">
+                    {% csrf_token %}
+                    {{ comment_form }}
+                    <input type="submit" name="comment" value="Add Comment" />
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    
 {% endblock %}

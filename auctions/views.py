@@ -15,12 +15,19 @@ from .forms import *
 def index(request):
     for auction in Auction.objects.all():
         update_auction_time(auction)
+    try:
+        user = User.objects.get(username=request.user)
+    except:
+        watchlist = 0
+    else:
+        watchlist = len(user.watchlist.all())
     return render(
         request,
         "auctions/index.html",
         {
             "listings": Auction.objects.all(),
             "category_form": CategoryForm(),
+            "len_watchlist": watchlist,
         },
     )
 
@@ -87,8 +94,6 @@ def create(request):
         form = CreateListingsForm(request.POST)
         form.instance.user = request.user
         form.instance.creation_date = timezone.now()
-        if request.POST["image"] == []:
-            form.instance.image = "https://cdn.onlinewebfonts.com/svg/img_391144.png"
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("index"))
@@ -138,6 +143,7 @@ def get_listing(request, listing_id):
             "message": message,
             "watchlist_text": button_text,
             "comments": auction.comments.all(),
+            "len_watchlist": len(user.watchlist.all()),
         },
     )
 
@@ -212,6 +218,7 @@ def watchlist(request):
         {
             "watchlist": user.watchlist.all(),
             "username": user.username.capitalize(),
+            "len_watchlist": len(user.watchlist.all()),
         },
     )
 
@@ -251,11 +258,13 @@ def categorize(request):
         if Auction.CATEGORY_CHOICES[i][0] == category_filter:
             category_index = i
     listings = Auction.objects.filter(category=category_filter)
+    user = User.objects.get(username=request.user)
     return render(
         request,
         "auctions/category_listing.html",
         {
             "listings": listings,
             "category": Auction.CATEGORY_CHOICES[category_index][1],
+            "len_watchlist": len(user.watchlist.all()),
         }
     )

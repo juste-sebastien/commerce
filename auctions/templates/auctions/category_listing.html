@@ -1,35 +1,43 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <article>
+    <article class="container-fluid">
         <h2>{{ category }}'s auctions</h2>
-        {% for listing in listings %}
-            <section>
-                <img src="{{ listing.image }}" alt="no article image" />
-                <div>
-                    <h3><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
-                    <p>{{ listing.description }}</p>
-                    <div>
-                        <p>End in {{ listing.remaining }}</p>
-                        <p>Seller: {{ listing.user }}</p>
+        <div>
+            {% for listing in listings %}
+                <section class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-2">
+                            <img class="img-fluid rounded-start" src="{{ listing.image }}" alt="no article image" />
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h3 class="card-header"><a href="{% url 'listing_view' listing.id %}">{{ listing.title }}</a></h3>
+                                <p class="card-text" style="min-height: 85px;">{{ listing.description }}</p>
+                                <div class="row g-0">
+                                    <p class="col-md-6" style="text-align: center;">End in {{ listing.remaining }}</p>
+                                    <p class="col-md-6" style="text-align: center;">Seller: {{ listing.user }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="card-footer">
+                                {% if listing.status %}
+                                    <h5>Current Price</h5>
+                                    <p style="font-size:xx-large; text-align: center;">{{ listing.price }}</p>
+                                {% else %}
+                                    <h5>Auction closed. Winner</h5>
+                                    <p style="font-size:xx-large; text-align: center;"{{ listing.winner }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            {% if listing.status %}
-                <div>
-                    <h5>Current Price</h5>
-                    <p>{{ listing.price }}</p>
-                </div>
-            {% else %}
-                <div>
-                    <h5>Auction closed. Winner</h5>
-                    <p>{{ listing.winner }}</p>
-                </div>
-            {% endif %}
-            </section>
-        {% empty %}
-        <section>
-            <p>No article yet. <a href="{% url 'listings_create' %}">Add</a> new one </p>
-        </section>}
-        {% endfor %}
+                </section>
+            {% empty %}
+                <section>
+                    <p>No article yet. <a href="{% url 'listings_create' %}">Add</a> new one </p>
+                </section>
+            {% endfor %}
+        </div>
     </article>
 {% endblock %}

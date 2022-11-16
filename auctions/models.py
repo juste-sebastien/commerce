@@ -43,7 +43,7 @@ class Auction(models.Model):
     title = models.CharField(max_length=64)
     description = models.TextField(max_length=500, blank=True)
     creation_date = models.DateTimeField(auto_now_add=True)
-    image = models.URLField(null=True, blank=True, default="")
+    image = models.URLField(null=True, blank=True, default="https://cdn.onlinewebfonts.com/svg/img_391144.png", )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller")
     duration = models.IntegerField(choices=DURATION_CHOICES)
     category = models.CharField(

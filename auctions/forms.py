@@ -23,3 +23,4 @@ class CommentForm(forms.ModelForm):
 
 class CategoryForm(forms.Form):
     select = forms.ChoiceField(choices=Auction.CATEGORY_CHOICES)
+    select.widget.attrs.update({"class": "form-select form-select-lg mb-3"})
