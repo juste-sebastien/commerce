@@ -4,6 +4,18 @@ from .models import *
 
 
 class CreateListingsForm(forms.ModelForm):
+    """
+    A class used to represent a form for create a new listing based on its model
+
+    ...
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+
+    """
     class Meta:
         model = Auction
         fields = ["title", "description", "image", "category", "duration", "price"]
@@ -44,6 +56,18 @@ class CreateListingsForm(forms.ModelForm):
 
 
 class BidForm(forms.ModelForm):
+    """
+    A class used to represent a form to add a bid to an auction based on its model
+
+    ...
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+
+    """
     class Meta:
         model = Bid
         fields = ["price"]
@@ -59,6 +83,18 @@ class BidForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
+    """
+    A class used to represent a form to add a comment to an auction based on its model
+
+    ...
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+
+    """
     class Meta:
         model = Comment
         fields = ["title", "content"]
@@ -79,5 +115,19 @@ class CommentForm(forms.ModelForm):
 
 
 class CategoryForm(forms.Form):
+    """
+    A class used to represent a form for create a new listing based on its model
+
+    ...
+
+    Attributes
+    ----------
+    select: Field
+        A ChoiceField for choosing the category of an auction
+
+    Methods
+    -------
+
+    """
     select = forms.ChoiceField(choices=Auction.CATEGORY_CHOICES)
     select.widget.attrs.update({"class": "form-select form-select-lg mb-3"})
