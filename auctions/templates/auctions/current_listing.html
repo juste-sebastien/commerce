@@ -20,7 +20,7 @@
                         <input class="btn btn-primary col-md-8" type="submit" name="watch" value="{{ watchlist_text }}" />
                     </form>
                 {% endif %}
-                <img class="col-md-4" scr="{{ auction.image }}" alt="No item image" />
+                <img class="col-md-4" scr="{{ image }}" alt="No item image" />
             </div>
             <div class="row"></div>
                 <h4>Description</h4>
@@ -43,7 +43,7 @@
                 {% elif user.id == auction.user.id and auction.status %}
                     <form class="col-md-8" action="{% url 'close_listing' auction.id %}" method="POST">
                         {% csrf_token %}
-                        <input type="submit" name="close" value="Close Auction" />
+                        <input class="btn btn-primary" type="submit" name="close" value="Close Auction" />
                     </form>
                 {% endif %}
                 <h4 class="col-md-2">End in</h4>
@@ -62,10 +62,10 @@
         {% endfor %}
         {% if user in users %}
             <div class="col">
-                <form class="col-md-12" method="POST">
+                <form class="row-md-12 g-5" method="POST">
                     {% csrf_token %}
                     {{ comment_form }}
-                    <input type="submit" name="comment" value="Add Comment" />
+                    <input class="btn btn-primary" type="submit" name="comment" value="Add Comment" style="margin-top: 10px;"/>
                 </form>
             </div>
         {% endif %}

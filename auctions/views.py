@@ -90,20 +90,27 @@ def register(request):
 
 @login_required
 def create(request):
+    user = User.objects.get(username=request.user)
     if request.method == "POST":
         form = CreateListingsForm(request.POST)
-        form.instance.user = request.user
+        form.instance.user = user.username
         form.instance.creation_date = timezone.now()
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("index"))
         else:
-            print(form.errors)
             form = CreateListingsForm()
-            return render(request, "auctions/listings.html", {"form": form})
+            return render(request, "auctions/listings.html", {
+                "form": form,
+                "len_watchlist": len(user.watchlist.all()),
+
+            })
     else:
         form = CreateListingsForm()
-        return render(request, "auctions/listings.html", {"form": form})
+        return render(request, "auctions/listings.html", {
+            "form": form,
+            "len_watchlist": len(user.watchlist.all()),
+        })
 
 
 def get_listing(request, listing_id):
@@ -130,7 +137,7 @@ def get_listing(request, listing_id):
             message = is_valid_comment(request, auction, user)
         else:
             button_text, message = modify_watchlist(auction, user)
-
+    print(auction.image, type(auction.image))
     return render(
         request,
         "auctions/current_listing.html",
@@ -144,6 +151,7 @@ def get_listing(request, listing_id):
             "watchlist_text": button_text,
             "comments": auction.comments.all(),
             "len_watchlist": len(user.watchlist.all()),
+            "image": auction.image,
         },
     )
 
