@@ -158,7 +158,7 @@ def create(request):
     user = User.objects.get(username=request.user)
     if request.method == "POST":
         form = CreateListingsForm(request.POST)
-        form.instance.user = user.username
+        form.instance.user = user
         form.instance.creation_date = timezone.now()
         if form.is_valid():
             form.save()
